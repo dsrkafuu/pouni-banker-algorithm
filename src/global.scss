@@ -1,0 +1,78 @@
+@font-face {
+  font-family: Inter;
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url('https://cdn.jsdelivr.net/gh/dsrkafuu/dsr-cdn-main@1/fonts/inter/inter_400.woff2')
+    format('woff2');
+}
+
+@font-face {
+  font-family: Inter;
+  font-style: normal;
+  font-display: swap;
+  font-weight: 500;
+  src: url('https://cdn.jsdelivr.net/gh/dsrkafuu/dsr-cdn-main@1/fonts/inter/inter_500.woff2')
+    format('woff2');
+}
+
+@font-face {
+  font-family: 'Noto Sans SC';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url('https://cdn.jsdelivr.net/gh/dsrkafuu/dsr-cdn-main@1/fonts/noto_sans_sc/noto_sans_sc_400.woff2')
+    format('woff2');
+}
+
+@font-face {
+  font-family: 'Noto Sans SC';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 500;
+  src: url('https://cdn.jsdelivr.net/gh/dsrkafuu/dsr-cdn-main@1/fonts/noto_sans_sc/noto_sans_sc_500.woff2')
+    format('woff2');
+}
+
+@font-face {
+  font-family: 'Fira Code';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url('https://cdn.jsdelivr.net/gh/dsrkafuu/dsr-cdn-main@1/fonts/fira_code/fira_code_400.woff2')
+    format('woff2');
+}
+
+@font-face {
+  font-family: 'Fira Code';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 500;
+  src: url('https://cdn.jsdelivr.net/gh/dsrkafuu/dsr-cdn-main@1/fonts/fira_code/fira_code_500.woff2')
+    format('woff2');
+}
+
+$font-family-en: Inter, -apple-system, BlinkMacSystemFont;
+$font-family-zh: 'Noto Sans SC', 'PingFang SC', 'Source Han Sans CN', 'Source Han Sans SC';
+$font-family-base: $font-family-en, $font-family-zh, ui-sans-serif, sans-serif;
+$font-family-mono: 'Fira Code', ui-monospace, $font-family-zh, monospace;
+
+html,
+body {
+  background-color: #f2f2f2;
+  font-size: 16px;
+  font-family: $font-family-base;
+}
+
+pre,
+code {
+  font-family: $font-family-mono;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  min-height: 100%;
+}

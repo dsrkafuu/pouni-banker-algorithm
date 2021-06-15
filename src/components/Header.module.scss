@@ -1,0 +1,23 @@
+.container {
+  position: relative;
+  height: 3.5rem;
+  background-color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 2px solid #f2f2f2;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.author {
+  position: absolute;
+  font-size: 0.875rem;
+  color: #8a8a8a;
+  right: 0.5rem;
+  bottom: 0.5rem;
+}

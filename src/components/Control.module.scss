@@ -1,0 +1,44 @@
+.control {
+  display: flex;
+  padding: 0.75rem 0;
+  border-bottom: 2px solid #f2f2f2;
+}
+
+.resource {
+  padding-left: 1rem;
+  padding-right: 0.5rem;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+
+  :global(.ant-slider) {
+    max-width: 20rem;
+  }
+
+  span {
+    margin-left: 0.5rem;
+    font-size: 14px;
+  }
+}
+
+.add {
+  flex: 0 0 auto;
+  width: 7rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.status {
+  flex: 0 0 auto;
+  width: 10rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  span:first-child {
+    flex: 1 1 auto;
+  }
+}
