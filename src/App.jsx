@@ -123,9 +123,9 @@ function App() {
   const [status, setStatus] = useState(null);
   const [orders, setOrders] = useState([0]);
   /**
-   * 触发计算
+   * 自动触发计算
    */
-  const getBanker = useCallback(() => {
+  useEffect(() => {
     const banker = new Banker(data.length, resNum, avail, data);
     setStatus(banker.get().status);
     if (banker.get().status) {
@@ -239,7 +239,6 @@ function App() {
           onOk={handleReqModalOk}
           onCancel={() => setCurReqModal(-1)}
         />
-        <Button onClick={() => getBanker()}>TEST</Button>
       </main>
     </div>
   );
