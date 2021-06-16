@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import styles from './Control.module.scss';
 import { Button, Slider } from 'antd';
-import { CheckCircleTwoTone, CloseCircleTwoTone } from '@ant-design/icons';
+import { CheckCircleTwoTone, CloseCircleTwoTone, MinusCircleTwoTone } from '@ant-design/icons';
 
 function Control({ resNum, onResNumChange, onProcessAdd, status }) {
   return (
@@ -16,7 +16,9 @@ function Control({ resNum, onResNumChange, onProcessAdd, status }) {
       <div className={styles.status}>
         <span>当前状态</span>
         <span>
-          {status ? (
+          {status === null ? (
+            <MinusCircleTwoTone />
+          ) : status ? (
             <CheckCircleTwoTone twoToneColor='#52c41a' />
           ) : (
             <CloseCircleTwoTone twoToneColor='#ff4d4f' />

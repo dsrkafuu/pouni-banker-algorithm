@@ -10,6 +10,7 @@ import RequestModal from './components/RequestModal';
 import { cloneDeep } from './utils/lodash';
 import { modArrayLength, addArray } from './utils/array';
 import { renderInt } from './utils/render';
+import Banker from './utils/Banker';
 
 function App() {
   // 资源种类数
@@ -118,7 +119,26 @@ function App() {
     [avail, curReqModal]
   );
 
-  const [orders, setOrders] = useState([]);
+  // 银行家计算
+  const [status, setStatus] = useState(null);
+  const [orders, setOrders] = useState([0]);
+  /**
+   * 触发计算
+   */
+  const getBanker = useCallback(() => {
+    const banker = new Banker(data.length, resNum, avail, data);
+    setStatus(banker.get().status);
+    if (banker.get().status) {
+      const ord = [0];
+      const query = banker.get().query;
+      for (let i = 0; i < data.length; i++) {
+        ord.push(query.indexOf(i) + 1);
+      }
+      setOrders(ord);
+    } else {
+      setOrders([0]);
+    }
+  }, [avail, data, resNum]);
 
   // 资源数据
   const dataSource = [{ key: 'total', name: '总资源数', max: avail, alloc: alloced, order: 0 }];
@@ -128,7 +148,7 @@ function App() {
       name: `P${idx}`,
       max: process[0],
       alloc: process[1],
-      order: orders[idx],
+      order: orders[idx + 1],
     });
   });
 
@@ -177,7 +197,7 @@ function App() {
     },
     {
       title: '顺序',
-      key: 'ctrl',
+      key: 'order',
       dataIndex: 'order',
       align: 'center',
       width: '4rem',
@@ -193,6 +213,7 @@ function App() {
           resNum={resNum}
           onResNumChange={(val) => setResNum(val)}
           onProcessAdd={handleProcessAdd}
+          status={status}
         />
         <div className={styles.data}>
           <Table
@@ -218,6 +239,7 @@ function App() {
           onOk={handleReqModalOk}
           onCancel={() => setCurReqModal(-1)}
         />
+        <Button onClick={() => getBanker()}>TEST</Button>
       </main>
     </div>
   );
