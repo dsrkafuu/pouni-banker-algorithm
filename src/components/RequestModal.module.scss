@@ -1,0 +1,6 @@
+.modal {
+  :global(.ant-modal-body) {
+    display: flex;
+    gap: 0.5rem;
+  }
+}

@@ -1,37 +1,15 @@
-import React, { memo, useEffect, useState } from 'react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
+import { Button, message, Table } from 'antd';
+
 import styles from './App.module.scss';
+
 import Header from './components/Header';
 import Control from './components/Control';
+import RequestModal from './components/RequestModal';
+
 import { cloneDeep } from './utils/lodash';
-import { Button, Table } from 'antd';
-
-/**
- * 调整数组长度
- * @param {any[]} arr
- * @param {number} length
- * @returns {any[]}
- */
-function modArrayLength(arr, length) {
-  let newArr;
-  if (arr.length >= length) {
-    newArr = cloneDeep(arr.slice(0, length));
-  } else {
-    newArr = [...cloneDeep(arr), ...new Array(length - arr.length)];
-  }
-  return newArr;
-}
-
-/**
- * 渲染整数
- * @param {number} val
- * @returns {string|number}
- */
-function renderInt(val) {
-  if (!val) {
-    return '-';
-  }
-  return val;
-}
+import { modArrayLength, addArray } from './utils/array';
+import { renderInt } from './utils/render';
 
 function App() {
   // 资源种类数
@@ -42,20 +20,24 @@ function App() {
   useEffect(() => setAvail((val) => modArrayLength(val, resNum)), [resNum]);
   // 总已分配量
   const [alloced, setAlloced] = useState(new Array(resNum));
-  useEffect(
-    () =>
-      setAlloced((val) => {
-        const arr = modArrayLength(val, resNum);
-        arr.fill(0);
-        return arr;
-      }),
-    [resNum]
-  );
+  useEffect(() => setAlloced((val) => modArrayLength(val, resNum).fill(0)), [resNum]);
 
   // 各进程数据
   const [data, setData] = useState([]);
-  // 响应进程添加
-  const addProcess = () => {
+  // 响应资源种类变化
+  useEffect(() => {
+    setData((val) => {
+      val.forEach((item) => {
+        item[0] = modArrayLength(item[0], resNum);
+        item[1] = new Array(resNum);
+      });
+      return val;
+    });
+  }, [resNum]);
+  /**
+   * 响应进程添加
+   */
+  const handleProcessAdd = useCallback(() => {
     setData((val) => {
       const procNum = data.length;
       if (val.length === procNum) {
@@ -68,21 +50,75 @@ function App() {
         return val;
       }
     });
-  };
-  // 响应资源种类变化
-  useEffect(
-    () =>
-      setData((val) => {
-        const newVal = cloneDeep(val);
-        newVal.forEach((item, idx) => {
-          item[0] = modArrayLength(item[0], resNum);
-          item[1] = new Array(resNum);
+  }, [data.length, resNum]);
+
+  // 设置模态框状态 (-1) (0) (1+)
+  const [curSetModal, setCurSetModal] = useState(-1);
+  /**
+   * 响应设置模态框确认
+   */
+  const handleSetModalOk = useCallback(
+    (values) => {
+      // 总量
+      if (curSetModal === 0) {
+        setAvail(values);
+      }
+      // 各进程最大量
+      else if (curSetModal > 0) {
+        setData((val) => {
+          const ret = cloneDeep(val);
+          ret[curSetModal - 1][0] = values;
+          return ret;
         });
-        return newVal;
-      }),
-    [resNum]
+      }
+      setCurSetModal(-1);
+    },
+    [curSetModal]
+  );
+  // 申请模态框状态 (-1) (1+)
+  const [curReqModal, setCurReqModal] = useState(-1);
+  /**
+   * 响应申请模态框确认
+   */
+  const handleReqModalOk = useCallback(
+    (values) => {
+      // 申请成功状态
+      let status = true;
+      // 设置当前进程申请量
+      setData((val) => {
+        const ret = cloneDeep(val);
+        const added = addArray(ret[curReqModal - 1][1], values, ret[curReqModal - 1][0]);
+        console.log(ret[curReqModal - 1][1], values, ret[curReqModal - 1][0]);
+        status = added.status;
+        if (status) {
+          ret[curReqModal - 1][1] = added.res;
+          return ret;
+        } else {
+          return val;
+        }
+      });
+      // 设置总申请量
+      setAlloced((val) => {
+        const added = addArray(val, values, avail);
+        status = status && added.status;
+        if (status) {
+          return added.res;
+        } else {
+          return val;
+        }
+      });
+      // 关闭模态框
+      if (status) {
+        message.success('已分配资源');
+        setCurReqModal(-1);
+      } else {
+        message.error('资源不足');
+      }
+    },
+    [avail, curReqModal]
   );
 
+  // 资源数据
   const dataSource = [{ key: 'total', name: '总资源数', max: avail, alloc: alloced, order: '-' }];
   data.forEach((process, idx) => {
     dataSource.push({
@@ -94,6 +130,7 @@ function App() {
     });
   });
 
+  // 表格列
   const columns = [
     { title: '进程', dataIndex: 'name', key: 'name', align: 'center', width: '6rem' },
   ];
@@ -126,8 +163,10 @@ function App() {
       render(text, rec, idx) {
         return (
           <>
-            <Button size='small'>设置{idx === 0 ? '总量' : '最多'}</Button>
-            <Button size='small' disabled={idx === 0}>
+            <Button size='small' onClick={() => setCurSetModal(idx)}>
+              设置{idx === 0 ? '总量' : '最多'}
+            </Button>
+            <Button size='small' disabled={idx === 0} onClick={() => setCurReqModal(idx)}>
               申请资源
             </Button>
           </>
@@ -144,13 +183,13 @@ function App() {
   );
 
   return (
-    <div className='app' className={styles.container}>
+    <div className={styles.container}>
       <Header />
       <main>
         <Control
-          resources={resNum}
-          onResourcesChange={(val) => setResNum(val)}
-          onProcessAdd={addProcess}
+          resNum={resNum}
+          onResNumChange={(val) => setResNum(val)}
+          onProcessAdd={handleProcessAdd}
         />
         <div className={styles.data}>
           <Table
@@ -161,8 +200,22 @@ function App() {
             pagination={false}
           />
         </div>
+        <RequestModal
+          visible={curSetModal >= 0}
+          title='设置资源数'
+          num={resNum}
+          min={0}
+          onOk={handleSetModalOk}
+          onCancel={() => setCurSetModal(-1)}
+        />
+        <RequestModal
+          visible={curReqModal > 0}
+          title='申请资源数'
+          num={resNum}
+          onOk={handleReqModalOk}
+          onCancel={() => setCurReqModal(-1)}
+        />
       </main>
-      <footer></footer>
     </div>
   );
 }
