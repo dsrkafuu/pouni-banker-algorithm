@@ -118,15 +118,17 @@ function App() {
     [avail, curReqModal]
   );
 
+  const [orders, setOrders] = useState([]);
+
   // 资源数据
-  const dataSource = [{ key: 'total', name: '总资源数', max: avail, alloc: alloced, order: '-' }];
+  const dataSource = [{ key: 'total', name: '总资源数', max: avail, alloc: alloced, order: 0 }];
   data.forEach((process, idx) => {
     dataSource.push({
       key: `p${idx}`,
       name: `P${idx}`,
       max: process[0],
       alloc: process[1],
-      order: '-',
+      order: orders[idx],
     });
   });
 
@@ -176,6 +178,7 @@ function App() {
     {
       title: '顺序',
       key: 'ctrl',
+      dataIndex: 'order',
       align: 'center',
       width: '4rem',
       render: renderInt,
